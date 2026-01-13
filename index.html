@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>STAIN — System Fatigue</title>
     <style>
+        /* Швейцарская база: чистота и отсутствие лишних элементов */
         body, html {
             margin: 0;
             padding: 0;
@@ -20,6 +21,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* Элемент слова: абсолютное позиционирование для наслоения */
         .word {
             position: absolute;
             text-transform: uppercase;
@@ -32,97 +34,87 @@
 
         #instructions {
             position: fixed;
-            bottom: 40px;
+            bottom: 30px;
             font-family: "Helvetica", Arial, sans-serif;
             font-size: 10px;
-            letter-spacing: 3px;
-            font-weight: bold;
+            letter-spacing: 4px;
             z-index: 1000;
-            opacity: 0.4;
-        }
-
-        .fade-out {
-            transition: opacity 5s ease-in-out;
-            opacity: 0 !important;
+            opacity: 0.5;
         }
     </style>
 </head>
 <body>
 
-    <div id="instructions">SYSTEM IDLE / TAP TO PROCESS</div>
+    <div id="instructions">SYSTEM IDLE // TAP TO PROCESS</div>
     <div id="canvas"></div>
 
     <script>
-        // Твой новый контент: смесь логов и экзистенциализма
-        const systemPhrases = [
-            "ERROR: MEMORY_FULL", 
-            "I remember this page", 
-            "Refreshing...", 
-            "Fragment #402", 
-            "Searching for light", 
-            "DATA_LEAK",
-            "SYSTEM_FATIGUE",
-            "Are you still there?",
-            "RECOVERY_FAILED",
-            "Ghost in the machine",
-            "BUFFER_OVERFLOW",
-            "Please, wait..."
+        // Объединяем контент и его визуальную роль
+        const fragments = [
+            { text: "ERROR: MEMORY_FULL", style: "tech" },
+            { text: "I remember this page", style: "exist" },
+            { text: "Refreshing...", style: "tech" },
+            { text: "Fragment #402", style: "tech" },
+            { text: "Searching for light", style: "exist" },
+            { text: "DATA_LEAK", style: "tech" },
+            { text: "SYSTEM_FATIGUE", style: "tech" },
+            { text: "Are you still there?", style: "exist" },
+            { text: "RECOVERY_FAILED", style: "tech" },
+            { text: "Ghost in the machine", style: "exist" },
+            { text: "BUFFER_OVERFLOW", style: "tech" }
         ];
-        
-        const fonts = [
-            "'Helvetica', 'Arial', sans-serif", // Для логов
-            "'Georgia', 'Times New Roman', serif" // Для экзистенциальных фраз
-        ];
-        
+
+        const fonts = {
+            tech: "'Helvetica Neue', Helvetica, Arial, sans-serif", // Гротеск для логов
+            exist: "'Georgia', 'Times New Roman', serif" // Антиква для чувств
+        };
+
         const canvas = document.getElementById('canvas');
-        const inst = document.getElementById('instructions');
         let clickCount = 0;
 
         document.body.addEventListener('click', function() {
+            // Убираем инструкцию при первом клике
             if (clickCount === 0) {
-                inst.style.display = 'none';
+                document.getElementById('instructions').style.display = 'none';
             }
 
+            const fragment = fragments[Math.floor(Math.random() * fragments.length)];
             const wordElement = document.createElement('div');
             wordElement.className = 'word';
-            
-            // Выбор фразы
-            const phrase = systemPhrases[Math.floor(Math.random() * systemPhrases.length)];
-            
-            // Логика выбора шрифта: если в фразе есть спецсимволы или капс, чаще ставим гротеск
-            const useSerif = phrase.includes(" ") && Math.random() > 0.3;
-            const randomFont = useSerif ? fonts[1] : fonts[0];
-            
-            const size = Math.floor(Math.random() * 110) + 25; // Чуть меньше размер для лучшей читаемости слоев
-            const rotation = (Math.floor(Math.random() * 4)) * 90;
-            
-            // Рандомное смещение от центра
-            const offsetX = (Math.random() - 0.5) * 120;
-            const offsetY = (Math.random() - 0.5) * 120;
+            wordElement.innerText = fragment.text;
 
-            wordElement.innerText = phrase;
-            wordElement.style.fontFamily = randomFont;
+            // 1. ПРИМЕНЕНИЕ ТИПОГРАФИКИ (Чихольд vs Карсон)
+            wordElement.style.fontFamily = fonts[fragment.style];
+            wordElement.style.fontWeight = fragment.style === "tech" ? "900" : "100";
+            
+            // 2. МАСШТАБ (от гигантского до крошечного)
+            // Используем широкий диапазон для создания "глубины"
+            const size = Math.random() > 0.8 ? (Math.random() * 200 + 150) : (Math.random() * 80 + 15);
             wordElement.style.fontSize = size + "px";
-            wordElement.style.fontWeight = useSerif ? "normal" : "bold";
-            
-            // Визуальное наложение
-            wordElement.style.transform = `translate(-50%, -50%) translate(${offsetX}px, ${offsetY}px) rotate(${randomRotation}deg)`;
-            
-            // Имитация "хрупкости" через разную прозрачность
-            wordElement.style.opacity = Math.random() * (0.9 - 0.4) + 0.4;
 
+            // 3. ПОВОРОТ (Вайнгарт: 0, 90, 180, 270)
+            const rotations = [0, 90, 180, 270];
+            const rotation = rotations[Math.floor(Math.random() * rotations.length)];
+
+            // 4. ЦЕНТРИРОВАНИЕ И СДВИГ
+            // Добавляем небольшой случайный сдвиг, чтобы слои не перекрывались идеально
+            const jitterX = (Math.random() - 0.5) * 40;
+            const jitterY = (Math.random() - 0.5) * 40;
+            
+            wordElement.style.transform = `translate(-50%, -50%) translate(${jitterX}px, ${jitterY}px) rotate(${rotation}deg)`;
+
+            // 5. НАКОПЛЕНИЕ
             canvas.appendChild(wordElement);
             clickCount++;
 
-            // Смерть системы
-            if (clickCount > 50) {
-                document.body.style.transition = "background-color 6s step-end";
+            // ФИНАЛ: Перенасыщение информацией
+            if (clickCount > 40) {
                 document.body.style.backgroundColor = "black";
-                canvas.classList.add('fade-out');
+                canvas.style.opacity = "0";
+                canvas.style.transition = "opacity 4s ease";
                 
-                setTimeout(() => {
-                    location.reload();
-                }, 12000);
+                // Перезагрузка системы
+                setTimeout(() => { location.reload(); }, 8000);
             }
         });
     </script>
