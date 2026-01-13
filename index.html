@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>STAIN — Digital Entropy Study</title>
+    <style>
+        /* 1. БАЗОВЫЕ НАСТРОЙКИ (Swiss Minimalism) */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            color: #000000;
+            overflow: hidden; /* Предотвращает скролл на Kindle */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent; /* Убирает выделение при клике */
+        }
+
+        /* 2. СТИЛЬ СЛОВ (Typographic Layers) */
+        .word {
+            position: absolute;
+            text-transform: uppercase;
+            line-height: 0.7;
+            white-space: nowrap;
+            pointer-events: none; /* Клики проходят сквозь текст */
+            left: 50%;
+            top: 50%;
+        }
+
+        /* 3. ИНСТРУКЦИЯ */
+        #instructions {
+            position: fixed;
+            bottom: 40px;
+            font-family: "Helvetica", Arial, sans-serif;
+            font-size: 11px;
+            letter-spacing: 5px;
+            font-weight: bold;
+            z-index: 1000;
+            opacity: 0.6;
+        }
+
+        /* Эффект для финальной деградации */
+        .fade-out {
+            transition: opacity 3s ease-in-out;
+            opacity: 0 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="instructions">TAP TO STAIN</div>
+    <div id="canvas"></div>
+
+    <script>
+        // Конфигурация проекта
+        const words = ["STAIN", "VOID", "DATA", "LOST", "ERROR", "INK", "MEMORY", "SYSTEM", "REPEAT", "FRAGMENT", "FADE", "MUTE", "NULL", "GHOST"];
+        
+        // Шрифтовая пара: Гротеск (Чихольд) против Антиквы (Классика)
+        const fonts = [
+            "'Helvetica', 'Arial', sans-serif", 
+            "'Georgia', 'Times New Roman', serif"
+        ];
+        
+        const canvas = document.getElementById('canvas');
+        const instructionTag = document.getElementById('instructions');
+        let clickCount = 0;
+
+        document.body.addEventListener('click', function() {
+            // Убираем подсказку при первом взаимодействии
+            if (clickCount === 0) {
+                instructionTag.style.display = 'none';
+            }
+
+            // Создаем новый слой типографики
+            const wordElement = document.createElement('div');
+            wordElement.className = 'word';
+            
+            // Генерируем случайные параметры
+            const randomWord = words[Math.floor(Math.random() * words.length)];
+            const randomFont = fonts[Math.floor(Math.random() * fonts.length)];
+            const size = Math.floor(Math.random() * 130) + 35; // От 35px до 165px
+            const rotation = (Math.floor(Math.random() * 4)) * 90; // 0, 90, 180, 270 градусов
+            const weight = Math.random() > 0.4 ? "bold" : "normal";
+            
+            // "Jitter" — небольшое хаотичное смещение от центра (в пикселях)
+            const offsetX = (Math.random() - 0.5) * 80; 
+            const offsetY = (Math.random() - 0.5) * 80;
+
+            // Применяем стили к элементу
+            wordElement.innerText = randomWord;
+            wordElement.style.fontFamily = randomFont;
+            wordElement.style.fontSize = size + "px";
+            wordElement.style.fontWeight = weight;
+            
+            // Центрирование + Поворот + Смещение
+            wordElement.style.transform = `translate(-50%, -50%) translate(${offsetX}px, ${offsetY}px) rotate(${rotation}deg)`;
+            
+            // Прозрачность для создания эффекта наслоения красок
+            wordElement.style.opacity = Math.random() * (1 - 0.5) + 0.5;
+
+            // Добавляем на экран
+            canvas.appendChild(wordElement);
+            clickCount++;
+
+            // ФИНАЛЬНАЯ СТАДИЯ: Цифровая Энтропия
+            // После 45 кликов всё превращается в "черный архив"
+            if (clickCount > 45) {
+                document.body.style.transition = "background-color 4s step-end";
+                document.body.style.backgroundColor = "black";
+                canvas.classList.add('fade-out');
+                
+                // Перезагрузка через некоторое время, чтобы начать цикл заново
+                setTimeout(() => {
+                    location.reload();
+                }, 10000);
+            }
+        });
+    </script>
+</body>
+</html>
