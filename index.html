@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>STAIN — Digital Entropy Study</title>
+    <title>STAIN — System Fatigue</title>
     <style>
-        /* 1. БАЗОВЫЕ НАСТРОЙКИ (Swiss Minimalism) */
         body, html {
             margin: 0;
             padding: 0;
@@ -13,111 +12,117 @@
             height: 100%;
             background-color: #ffffff;
             color: #000000;
-            overflow: hidden; /* Предотвращает скролл на Kindle */
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            -webkit-tap-highlight-color: transparent; /* Убирает выделение при клике */
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* 2. СТИЛЬ СЛОВ (Typographic Layers) */
         .word {
             position: absolute;
             text-transform: uppercase;
-            line-height: 0.7;
+            line-height: 0.8;
             white-space: nowrap;
-            pointer-events: none; /* Клики проходят сквозь текст */
+            pointer-events: none;
             left: 50%;
             top: 50%;
         }
 
-        /* 3. ИНСТРУКЦИЯ */
         #instructions {
             position: fixed;
             bottom: 40px;
             font-family: "Helvetica", Arial, sans-serif;
-            font-size: 11px;
-            letter-spacing: 5px;
+            font-size: 10px;
+            letter-spacing: 3px;
             font-weight: bold;
             z-index: 1000;
-            opacity: 0.6;
+            opacity: 0.4;
         }
 
-        /* Эффект для финальной деградации */
         .fade-out {
-            transition: opacity 3s ease-in-out;
+            transition: opacity 5s ease-in-out;
             opacity: 0 !important;
         }
     </style>
 </head>
 <body>
 
-    <div id="instructions">TAP TO STAIN</div>
+    <div id="instructions">SYSTEM IDLE / TAP TO PROCESS</div>
     <div id="canvas"></div>
 
     <script>
-        // Конфигурация проекта
-        const words = ["STAIN", "VOID", "DATA", "LOST", "ERROR", "INK", "MEMORY", "SYSTEM", "REPEAT", "FRAGMENT", "FADE", "MUTE", "NULL", "GHOST"];
+        // Твой новый контент: смесь логов и экзистенциализма
+        const systemPhrases = [
+            "ERROR: MEMORY_FULL", 
+            "I remember this page", 
+            "Refreshing...", 
+            "Fragment #402", 
+            "Searching for light", 
+            "DATA_LEAK",
+            "SYSTEM_FATIGUE",
+            "Are you still there?",
+            "RECOVERY_FAILED",
+            "Ghost in the machine",
+            "BUFFER_OVERFLOW",
+            "Please, wait..."
+        ];
         
-        // Шрифтовая пара: Гротеск (Чихольд) против Антиквы (Классика)
         const fonts = [
-            "'Helvetica', 'Arial', sans-serif", 
-            "'Georgia', 'Times New Roman', serif"
+            "'Helvetica', 'Arial', sans-serif", // Для логов
+            "'Georgia', 'Times New Roman', serif" // Для экзистенциальных фраз
         ];
         
         const canvas = document.getElementById('canvas');
-        const instructionTag = document.getElementById('instructions');
+        const inst = document.getElementById('instructions');
         let clickCount = 0;
 
         document.body.addEventListener('click', function() {
-            // Убираем подсказку при первом взаимодействии
             if (clickCount === 0) {
-                instructionTag.style.display = 'none';
+                inst.style.display = 'none';
             }
 
-            // Создаем новый слой типографики
             const wordElement = document.createElement('div');
             wordElement.className = 'word';
             
-            // Генерируем случайные параметры
-            const randomWord = words[Math.floor(Math.random() * words.length)];
-            const randomFont = fonts[Math.floor(Math.random() * fonts.length)];
-            const size = Math.floor(Math.random() * 130) + 35; // От 35px до 165px
-            const rotation = (Math.floor(Math.random() * 4)) * 90; // 0, 90, 180, 270 градусов
-            const weight = Math.random() > 0.4 ? "bold" : "normal";
+            // Выбор фразы
+            const phrase = systemPhrases[Math.floor(Math.random() * systemPhrases.length)];
             
-            // "Jitter" — небольшое хаотичное смещение от центра (в пикселях)
-            const offsetX = (Math.random() - 0.5) * 80; 
-            const offsetY = (Math.random() - 0.5) * 80;
+            // Логика выбора шрифта: если в фразе есть спецсимволы или капс, чаще ставим гротеск
+            const useSerif = phrase.includes(" ") && Math.random() > 0.3;
+            const randomFont = useSerif ? fonts[1] : fonts[0];
+            
+            const size = Math.floor(Math.random() * 110) + 25; // Чуть меньше размер для лучшей читаемости слоев
+            const rotation = (Math.floor(Math.random() * 4)) * 90;
+            
+            // Рандомное смещение от центра
+            const offsetX = (Math.random() - 0.5) * 120;
+            const offsetY = (Math.random() - 0.5) * 120;
 
-            // Применяем стили к элементу
-            wordElement.innerText = randomWord;
+            wordElement.innerText = phrase;
             wordElement.style.fontFamily = randomFont;
             wordElement.style.fontSize = size + "px";
-            wordElement.style.fontWeight = weight;
+            wordElement.style.fontWeight = useSerif ? "normal" : "bold";
             
-            // Центрирование + Поворот + Смещение
-            wordElement.style.transform = `translate(-50%, -50%) translate(${offsetX}px, ${offsetY}px) rotate(${rotation}deg)`;
+            // Визуальное наложение
+            wordElement.style.transform = `translate(-50%, -50%) translate(${offsetX}px, ${offsetY}px) rotate(${randomRotation}deg)`;
             
-            // Прозрачность для создания эффекта наслоения красок
-            wordElement.style.opacity = Math.random() * (1 - 0.5) + 0.5;
+            // Имитация "хрупкости" через разную прозрачность
+            wordElement.style.opacity = Math.random() * (0.9 - 0.4) + 0.4;
 
-            // Добавляем на экран
             canvas.appendChild(wordElement);
             clickCount++;
 
-            // ФИНАЛЬНАЯ СТАДИЯ: Цифровая Энтропия
-            // После 45 кликов всё превращается в "черный архив"
-            if (clickCount > 45) {
-                document.body.style.transition = "background-color 4s step-end";
+            // Смерть системы
+            if (clickCount > 50) {
+                document.body.style.transition = "background-color 6s step-end";
                 document.body.style.backgroundColor = "black";
                 canvas.classList.add('fade-out');
                 
-                // Перезагрузка через некоторое время, чтобы начать цикл заново
                 setTimeout(() => {
                     location.reload();
-                }, 10000);
+                }, 12000);
             }
         });
     </script>
