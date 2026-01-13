@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>STAIN — System Fatigue</title>
     <style>
-        /* Швейцарская база: чистота и отсутствие лишних элементов */
         body, html {
             margin: 0;
             padding: 0;
@@ -21,7 +20,13 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Элемент слова: абсолютное позиционирование для наслоения */
+        /* Контейнер для всех слоев */
+        #canvas {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
         .word {
             position: absolute;
             text-transform: uppercase;
@@ -30,6 +35,7 @@
             pointer-events: none;
             left: 50%;
             top: 50%;
+            /* translate(-50%, -50%) гарантирует появление точно в центре */
         }
 
         #instructions {
@@ -37,84 +43,89 @@
             bottom: 30px;
             font-family: "Helvetica", Arial, sans-serif;
             font-size: 10px;
-            letter-spacing: 4px;
+            letter-spacing: 5px;
+            font-weight: bold;
             z-index: 1000;
-            opacity: 0.5;
+            opacity: 0.3;
         }
     </style>
 </head>
 <body>
 
-    <div id="instructions">SYSTEM IDLE // TAP TO PROCESS</div>
+    <div id="instructions">PROCESS // TAP</div>
     <div id="canvas"></div>
 
     <script>
-        // Объединяем контент и его визуальную роль
-        const fragments = [
-            { text: "ERROR: MEMORY_FULL", style: "tech" },
-            { text: "I remember this page", style: "exist" },
-            { text: "Refreshing...", style: "tech" },
-            { text: "Fragment #402", style: "tech" },
-            { text: "Searching for light", style: "exist" },
-            { text: "DATA_LEAK", style: "tech" },
-            { text: "SYSTEM_FATIGUE", style: "tech" },
-            { text: "Are you still there?", style: "exist" },
-            { text: "RECOVERY_FAILED", style: "tech" },
-            { text: "Ghost in the machine", style: "exist" },
-            { text: "BUFFER_OVERFLOW", style: "tech" }
+        // Контент: Технические логи vs Экзистенциальные фразы
+        const phrases = [
+            { t: "ERROR: MEMORY_FULL", type: "tech" },
+            { t: "I remember this page", type: "exist" },
+            { t: "Refreshing...", type: "tech" },
+            { t: "Fragment #402", type: "tech" },
+            { t: "Searching for light", type: "exist" },
+            { t: "DATA_LEAK", type: "tech" },
+            { t: "SYSTEM_FATIGUE", type: "tech" },
+            { t: "Are you still there?", type: "exist" },
+            { t: "RECOVERY_FAILED", type: "tech" },
+            { t: "Ghost in the machine", type: "exist" },
+            { t: "BUFFER_OVERFLOW", type: "tech" }
         ];
 
-        const fonts = {
-            tech: "'Helvetica Neue', Helvetica, Arial, sans-serif", // Гротеск для логов
-            exist: "'Georgia', 'Times New Roman', serif" // Антиква для чувств
-        };
-
         const canvas = document.getElementById('canvas');
-        let clickCount = 0;
+        let count = 0;
 
         document.body.addEventListener('click', function() {
-            // Убираем инструкцию при первом клике
-            if (clickCount === 0) {
+            if (count === 0) {
                 document.getElementById('instructions').style.display = 'none';
             }
 
-            const fragment = fragments[Math.floor(Math.random() * fragments.length)];
-            const wordElement = document.createElement('div');
-            wordElement.className = 'word';
-            wordElement.innerText = fragment.text;
+            const fragment = phrases[Math.floor(Math.random() * phrases.length)];
+            const el = document.createElement('div');
+            el.className = 'word';
+            el.innerText = fragment.t;
 
-            // 1. ПРИМЕНЕНИЕ ТИПОГРАФИКИ (Чихольд vs Карсон)
-            wordElement.style.fontFamily = fonts[fragment.style];
-            wordElement.style.fontWeight = fragment.style === "tech" ? "900" : "100";
-            
-            // 2. МАСШТАБ (от гигантского до крошечного)
-            // Используем широкий диапазон для создания "глубины"
-            const size = Math.random() > 0.8 ? (Math.random() * 200 + 150) : (Math.random() * 80 + 15);
-            wordElement.style.fontSize = size + "px";
+            // 1. ШРИФТОВАЯ ПАРА (Bold Sans vs Thin Serif)
+            if (fragment.type === "tech") {
+                el.style.fontFamily = "'Helvetica Neue', Helvetica, Arial, sans-serif";
+                el.style.fontWeight = "900"; // Максимально жирный
+            } else {
+                el.style.fontFamily = "'Georgia', 'Times New Roman', serif";
+                el.style.fontWeight = "100"; // Тонкая антиква
+                el.style.fontStyle = "italic";
+            }
 
-            // 3. ПОВОРОТ (Вайнгарт: 0, 90, 180, 270)
+            // 2. МАСШТАБ (Экстремальный разброс)
+            // 20% шанс появления гигантского слова на весь экран
+            const isGiant = Math.random() > 0.8;
+            const size = isGiant ? (Math.random() * 150 + 150) : (Math.random() * 70 + 10);
+            el.style.fontSize = size + "px";
+
+            // 3. УГОЛ (Строго 90 градусов - швейцарская школа)
             const rotations = [0, 90, 180, 270];
             const rotation = rotations[Math.floor(Math.random() * rotations.length)];
 
-            // 4. ЦЕНТРИРОВАНИЕ И СДВИГ
-            // Добавляем небольшой случайный сдвиг, чтобы слои не перекрывались идеально
-            const jitterX = (Math.random() - 0.5) * 40;
-            const jitterY = (Math.random() - 0.5) * 40;
+            // 4. ПОЗИЦИОНИРОВАНИЕ (Центр с легким хаосом)
+            // Небольшой "jitter" (смещение), чтобы создать эффект коллажа Вайнгарта
+            const jitterX = (Math.random() - 0.5) * 100;
+            const jitterY = (Math.random() - 0.5) * 100;
             
-            wordElement.style.transform = `translate(-50%, -50%) translate(${jitterX}px, ${jitterY}px) rotate(${rotation}deg)`;
+            el.style.transform = `translate(-50%, -50%) translate(${jitterX}px, ${jitterY}px) rotate(${rotation}deg)`;
+            
+            // 5. НАКОПЛЕНИЕ ШУМА
+            // Разная прозрачность имитирует глубину и физическое наслоение чернил
+            el.style.opacity = Math.random() * (0.9 - 0.5) + 0.5;
 
-            // 5. НАКОПЛЕНИЕ
-            canvas.appendChild(wordElement);
-            clickCount++;
+            canvas.appendChild(el);
+            count++;
 
-            // ФИНАЛ: Перенасыщение информацией
-            if (clickCount > 40) {
+            // 6. ФИНАЛЬНАЯ ТОЧКА (Цифровой архив умирает)
+            if (count > 45) {
+                document.body.style.transition = "background-color 5s step-end";
                 document.body.style.backgroundColor = "black";
+                canvas.style.transition = "opacity 3s ease";
                 canvas.style.opacity = "0";
-                canvas.style.transition = "opacity 4s ease";
                 
-                // Перезагрузка системы
-                setTimeout(() => { location.reload(); }, 8000);
+                setTimeout(() => { location.reload(); }, 10000);
             }
         });
     </script>
