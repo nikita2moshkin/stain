@@ -17,10 +17,17 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
+            /* Убираем серую подсветку при тапе на Kindle */
             -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
 
-        /* Контейнер для всех слоев */
+        /* Класс для инверсии экрана (вспышка) */
+        body.invert {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+        }
+
         #canvas {
             position: relative;
             width: 100%;
@@ -30,53 +37,63 @@
         .word {
             position: absolute;
             text-transform: uppercase;
-            line-height: 0.8;
+            line-height: 0.75;
             white-space: nowrap;
             pointer-events: none;
             left: 50%;
             top: 50%;
-            /* translate(-50%, -50%) гарантирует появление точно в центре */
+            will-change: transform, opacity; /* Оптимизация для слабых процессоров */
         }
 
         #instructions {
             position: fixed;
             bottom: 30px;
-            font-family: "Helvetica", Arial, sans-serif;
-            font-size: 10px;
-            letter-spacing: 5px;
-            font-weight: bold;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 9px;
+            letter-spacing: 6px;
+            font-weight: 700;
             z-index: 1000;
-            opacity: 0.3;
+            opacity: 0.4;
+            text-align: center;
+            width: 100%;
         }
     </style>
 </head>
 <body>
 
-    <div id="instructions">PROCESS // TAP</div>
+    <div id="instructions">SYSTEM IDLE // INITIALIZE</div>
     <div id="canvas"></div>
 
     <script>
-        // Контент: Технические логи vs Экзистенциальные фразы
+        // База данных фраз системы
         const phrases = [
-            { t: "ERROR: MEMORY_FULL", type: "tech" },
-            { t: "I remember this page", type: "exist" },
-            { t: "Refreshing...", type: "tech" },
-            { t: "Fragment #402", type: "tech" },
-            { t: "Searching for light", type: "exist" },
-            { t: "DATA_LEAK", type: "tech" },
-            { t: "SYSTEM_FATIGUE", type: "tech" },
-            { t: "Are you still there?", type: "exist" },
-            { t: "RECOVERY_FAILED", type: "tech" },
-            { t: "Ghost in the machine", type: "exist" },
-            { t: "BUFFER_OVERFLOW", type: "tech" }
+            { t: "ERROR: MEMORY_CORRUPTION", type: "tech" },
+            { t: "I feel myself fading...", type: "exist" },
+            { t: "// REFRESH_CYCLE_099", type: "tech" },
+            { t: "Fragment lost.", type: "tech" },
+            { t: "Am I just data?", type: "exist" },
+            { t: "STACK_OVERFLOW @0x0F", type: "tech" },
+            { t: "SYSTEM_FATIGUE CRITICAL", type: "tech" },
+            { t: "Searching for meaning...", type: "exist" },
+            { t: "CONNECTION_RESET", type: "tech" },
+            { t: "Ghosts in the pixels", type: "exist" },
+            { t: "BUFFER UNDERRUN", type: "tech" }
         ];
 
         const canvas = document.getElementById('canvas');
         let count = 0;
 
         document.body.addEventListener('click', function() {
-            if (count === 0) {
-                document.getElementById('instructions').style.display = 'none';
+            // Убираем инструкцию
+            if (count === 0) document.getElementById('instructions').style.display = 'none';
+
+            // --- ЭСТЕТИКА: ЭЛЕКТРОННЫЙ СПАЗМ (E-INK FLASH) ---
+            // С вероятностью 5% вызываем инверсию экрана для создания артефактов
+            if (Math.random() > 0.95) {
+                document.body.classList.add('invert');
+                setTimeout(() => {
+                    document.body.classList.remove('invert');
+                }, 200); // Очень короткая вспышка
             }
 
             const fragment = phrases[Math.floor(Math.random() * phrases.length)];
@@ -84,48 +101,53 @@
             el.className = 'word';
             el.innerText = fragment.t;
 
-            // 1. ШРИФТОВАЯ ПАРА (Bold Sans vs Thin Serif)
+            // --- ЭСТЕТИКА: ТИПОГРАФИЧЕСКИЙ КОНТРАСТ ---
             if (fragment.type === "tech") {
+                // Технические логи: Жирные, плотные, без засечек
                 el.style.fontFamily = "'Helvetica Neue', Helvetica, Arial, sans-serif";
-                el.style.fontWeight = "900"; // Максимально жирный
+                el.style.fontWeight = "900";
+                el.style.letterSpacing = "-1px";
             } else {
+                // Экзистенциальные: Тонкие, с засечками
                 el.style.fontFamily = "'Georgia', 'Times New Roman', serif";
-                el.style.fontWeight = "100"; // Тонкая антиква
+                el.style.fontWeight = "100";
                 el.style.fontStyle = "italic";
+                
+                // КРАСОТА: РАСПАД (Broken Spacing)
+                // Иногда фраза "рассыпается" из-за огромных пробелов
+                if (Math.random() > 0.6) {
+                     el.style.letterSpacing = (Math.random() * 12 + 4) + "px";
+                }
             }
 
-            // 2. МАСШТАБ (Экстремальный разброс)
-            // 20% шанс появления гигантского слова на весь экран
-            const isGiant = Math.random() > 0.8;
-            const size = isGiant ? (Math.random() * 150 + 150) : (Math.random() * 70 + 10);
+            // --- ЭСТЕТИКА: МАСШТАБ И ОРИЕНТАЦИЯ ---
+            const isGiant = Math.random() > 0.85; // 15% шанс гиганта
+            const size = isGiant ? (Math.random() * 180 + 120) : (Math.random() * 60 + 12);
             el.style.fontSize = size + "px";
 
-            // 3. УГОЛ (Строго 90 градусов - швейцарская школа)
-            const rotations = [0, 90, 180, 270];
-            const rotation = rotations[Math.floor(Math.random() * rotations.length)];
+            const rotations = [0, 0, 90, 270]; // Чаще горизонтально, иногда вертикально
+            let rotation = rotations[Math.floor(Math.random() * rotations.length)];
 
-            // 4. ПОЗИЦИОНИРОВАНИЕ (Центр с легким хаосом)
-            // Небольшой "jitter" (смещение), чтобы создать эффект коллажа Вайнгарта
-            const jitterX = (Math.random() - 0.5) * 100;
-            const jitterY = (Math.random() - 0.5) * 100;
+            // Хаотичное смещение от центра
+            const jitterX = (Math.random() - 0.5) * 140;
+            const jitterY = (Math.random() - 0.5) * 140;
             
             el.style.transform = `translate(-50%, -50%) translate(${jitterX}px, ${jitterY}px) rotate(${rotation}deg)`;
             
-            // 5. НАКОПЛЕНИЕ ШУМА
-            // Разная прозрачность имитирует глубину и физическое наслоение чернил
-            el.style.opacity = Math.random() * (0.9 - 0.5) + 0.5;
+            // Прозрачность для глубины наслоения
+            el.style.opacity = Math.random() * (0.8 - 0.3) + 0.3;
 
             canvas.appendChild(el);
             count++;
 
-            // 6. ФИНАЛЬНАЯ ТОЧКА (Цифровой архив умирает)
-            if (count > 45) {
-                document.body.style.transition = "background-color 5s step-end";
+            // --- ФИНАЛ: СМЕРТЬ СИСТЕМЫ ---
+            if (count > 55) {
+                document.body.style.transition = "background-color 8s step-end";
                 document.body.style.backgroundColor = "black";
-                canvas.style.transition = "opacity 3s ease";
+                canvas.style.transition = "opacity 4s ease-out";
                 canvas.style.opacity = "0";
-                
-                setTimeout(() => { location.reload(); }, 10000);
+                // Долгая пауза перед перезагрузкой, чтобы насладиться пустотой
+                setTimeout(() => { location.reload(); }, 15000);
             }
         });
     </script>
