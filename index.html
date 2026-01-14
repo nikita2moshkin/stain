@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>STAIN — System Fatigue</title>
+    <title>STAIN — System Decay</title>
     <style>
         body, html {
             margin: 0;
@@ -13,28 +13,20 @@
             background-color: #ffffff;
             color: #000000;
             overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             cursor: pointer;
-            /* Убираем серую подсветку при тапе на Kindle */
             -webkit-tap-highlight-color: transparent;
-            transition: background-color 0.2s ease, color 0.2s ease;
+            transition: background-color 0.1s step-end; /* Для резких вспышек */
         }
 
-        /* Класс для инверсии экрана (вспышка) */
-        body.invert {
-            background-color: #000000 !important;
-            color: #ffffff !important;
-        }
-
-        #canvas {
+        /* Контейнер теперь на весь экран для отслеживания кликов */
+        #stage {
             position: relative;
             width: 100%;
             height: 100%;
         }
 
-        .word {
+        /* Базовый стиль слова */
+        .element {
             position: absolute;
             text-transform: uppercase;
             line-height: 0.75;
@@ -42,114 +34,150 @@
             pointer-events: none;
             left: 50%;
             top: 50%;
-            will-change: transform, opacity; /* Оптимизация для слабых процессоров */
+            mix-blend-mode: multiply; /* Усиливает грязь при наслоении */
+        }
+
+        /* Стиль для черных блоков цензуры (Глитч) */
+        .block {
+            background-color: black;
+            height: 1em;
+            width: 100%;
         }
 
         #instructions {
             position: fixed;
             bottom: 30px;
+            width: 100%;
+            text-align: center;
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             font-size: 9px;
             letter-spacing: 6px;
-            font-weight: 700;
-            z-index: 1000;
+            font-weight: bold;
+            z-index: 2000;
             opacity: 0.4;
-            text-align: center;
-            width: 100%;
+        }
+
+        /* Класс для инверсии экрана (вспышка E-ink) */
+        .invert-flash {
+            filter: invert(100%);
         }
     </style>
 </head>
 <body>
 
-    <div id="instructions">SYSTEM IDLE // INITIALIZE</div>
-    <div id="canvas"></div>
+    <div id="instructions">CENTER: DATA // EDGES: GLITCH</div>
+    <div id="stage"></div>
 
     <script>
-        // База данных фраз системы
         const phrases = [
-            { t: "ERROR: MEMORY_CORRUPTION", type: "tech" },
-            { t: "I feel myself fading...", type: "exist" },
-            { t: "// REFRESH_CYCLE_099", type: "tech" },
-            { t: "Fragment lost.", type: "tech" },
-            { t: "Am I just data?", type: "exist" },
-            { t: "STACK_OVERFLOW @0x0F", type: "tech" },
-            { t: "SYSTEM_FATIGUE CRITICAL", type: "tech" },
-            { t: "Searching for meaning...", type: "exist" },
-            { t: "CONNECTION_RESET", type: "tech" },
-            { t: "Ghosts in the pixels", type: "exist" },
-            { t: "BUFFER UNDERRUN", type: "tech" }
+            { t: "ERROR_TYPE_402", type: "tech" }, { t: "MEMORY LEAK", type: "tech" },
+            { t: "I remember light", type: "exist" }, { t: "Searching...", type: "tech" },
+            { t: "Are you still there?", type: "exist" }, { t: "SYSTEM FATIGUE", type: "tech" },
+            { t: "Fragmented soul", type: "exist" }, { t: "BUFFER OVERFLOW", type: "tech" },
+            { t: "VOID DETECTED", type: "tech" }, { t: "Please wait...", type: "exist" }
         ];
+        
+        // Глитч-символы для боковых зон
+        const glitchChars = ["█", "▓", "▒", "░", "//", "??", "ERROR", "×××"];
 
-        const canvas = document.getElementById('canvas');
+        const stage = document.getElementById('stage');
         let count = 0;
 
-        document.body.addEventListener('click', function() {
-            // Убираем инструкцию
+        // Главный обработчик кликов
+        stage.addEventListener('click', function(e) {
             if (count === 0) document.getElementById('instructions').style.display = 'none';
+            count++;
 
-            // --- ЭСТЕТИКА: ЭЛЕКТРОННЫЙ СПАЗМ (E-INK FLASH) ---
-            // С вероятностью 5% вызываем инверсию экрана для создания артефактов
-            if (Math.random() > 0.95) {
-                document.body.classList.add('invert');
-                setTimeout(() => {
-                    document.body.classList.remove('invert');
-                }, 200); // Очень короткая вспышка
+            // Определение зоны клика (Интерактивность)
+            const clickX = e.clientX;
+            const screenW = window.innerWidth;
+            // Если клик в левых 20% или правых 20% экрана -> ГЛИТЧ
+            const isEdge = clickX < screenW * 0.2 || clickX > screenW * 0.8;
+
+            if (isEdge) {
+                triggerGlitch();
+            } else {
+                addContent();
             }
 
+            // Шанс 10% вызвать вспышку экрана (физический глитч E-ink)
+            if (Math.random() > 0.90) {
+                document.body.classList.add('invert-flash');
+                setTimeout(() => { document.body.classList.remove('invert-flash'); }, 150);
+            }
+
+            // Финал: ускоренная смерть системы
+            if (count > 40) {
+                document.body.style.backgroundColor = "black";
+                stage.style.opacity = "0";
+                stage.style.transition = "opacity 2s ease";
+                setTimeout(() => { location.reload(); }, 5000);
+            }
+        });
+
+        // Функция добавления осмысленного контента (Центр)
+        function addContent() {
             const fragment = phrases[Math.floor(Math.random() * phrases.length)];
             const el = document.createElement('div');
-            el.className = 'word';
+            el.className = 'element';
             el.innerText = fragment.t;
 
-            // --- ЭСТЕТИКА: ТИПОГРАФИЧЕСКИЙ КОНТРАСТ ---
             if (fragment.type === "tech") {
-                // Технические логи: Жирные, плотные, без засечек
-                el.style.fontFamily = "'Helvetica Neue', Helvetica, Arial, sans-serif";
+                // Чихольд: Жирный, плотный гротеск
+                el.style.fontFamily = "'Helvetica Neue', Arial, sans-serif";
                 el.style.fontWeight = "900";
                 el.style.letterSpacing = "-1px";
             } else {
-                // Экзистенциальные: Тонкие, с засечками
-                el.style.fontFamily = "'Georgia', 'Times New Roman', serif";
+                // Экзистенциализм: Тонкая, рассыпающаяся антиква
+                el.style.fontFamily = "'Georgia', serif";
                 el.style.fontWeight = "100";
                 el.style.fontStyle = "italic";
-                
-                // КРАСОТА: РАСПАД (Broken Spacing)
-                // Иногда фраза "рассыпается" из-за огромных пробелов
-                if (Math.random() > 0.6) {
-                     el.style.letterSpacing = (Math.random() * 12 + 4) + "px";
-                }
+                // Красота: экстремальное разрежение текста
+                el.style.letterSpacing = (Math.random() * 10 + 2) + "px";
             }
 
-            // --- ЭСТЕТИКА: МАСШТАБ И ОРИЕНТАЦИЯ ---
-            const isGiant = Math.random() > 0.85; // 15% шанс гиганта
-            const size = isGiant ? (Math.random() * 180 + 120) : (Math.random() * 60 + 12);
+            placeElement(el, true); // true = контент (большой разброс)
+        }
+
+        // Функция добавления глитчей (Края)
+        function triggerGlitch() {
+            const el = document.createElement('div');
+            el.className = 'element';
+            
+            // Либо черный блок, либо мусорные символы
+            if (Math.random() > 0.5) {
+                el.innerText = glitchChars[Math.floor(Math.random() * glitchChars.length)];
+                el.style.fontFamily = "monospace";
+                el.style.fontWeight = "bold";
+            } else {
+                el.classList.add('block'); // Черный прямоугольник
+                el.style.width = (Math.random() * 200 + 50) + "px";
+            }
+            
+            placeElement(el, false); // false = глитч (меньший разброс)
+        }
+
+        // Общая функция позиционирования
+        function placeElement(el, isContent) {
+            // Масштаб
+            const baseSize = isContent ? 150 : 80;
+            const size = Math.random() * baseSize + 20;
             el.style.fontSize = size + "px";
 
-            const rotations = [0, 0, 90, 270]; // Чаще горизонтально, иногда вертикально
-            let rotation = rotations[Math.floor(Math.random() * rotations.length)];
+            // Поворот (Строгая сетка)
+            const rotations = [0, 90, 180, 270];
+            const rotation = rotations[Math.floor(Math.random() * rotations.length)];
 
-            // Хаотичное смещение от центра
-            const jitterX = (Math.random() - 0.5) * 140;
-            const jitterY = (Math.random() - 0.5) * 140;
+            // Смещение от центра (Хаос)
+            const spread = isContent ? 120 : 180; // Глитчи разлетаются дальше
+            const jitterX = (Math.random() - 0.5) * spread;
+            const jitterY = (Math.random() - 0.5) * spread;
             
             el.style.transform = `translate(-50%, -50%) translate(${jitterX}px, ${jitterY}px) rotate(${rotation}deg)`;
-            
-            // Прозрачность для глубины наслоения
-            el.style.opacity = Math.random() * (0.8 - 0.3) + 0.3;
+            el.style.opacity = Math.random() * (0.9 - 0.3) + 0.3;
 
-            canvas.appendChild(el);
-            count++;
-
-            // --- ФИНАЛ: СМЕРТЬ СИСТЕМЫ ---
-            if (count > 55) {
-                document.body.style.transition = "background-color 8s step-end";
-                document.body.style.backgroundColor = "black";
-                canvas.style.transition = "opacity 4s ease-out";
-                canvas.style.opacity = "0";
-                // Долгая пауза перед перезагрузкой, чтобы насладиться пустотой
-                setTimeout(() => { location.reload(); }, 15000);
-            }
-        });
+            stage.appendChild(el);
+        }
     </script>
 </body>
 </html>
